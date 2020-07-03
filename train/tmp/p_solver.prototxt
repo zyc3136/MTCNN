@@ -1,0 +1,16 @@
+test_iter: 1449
+test_interval: 5860
+base_lr: 0.05
+display: 500
+max_iter: 146512
+lr_policy: "step"
+gamma: 0.1
+momentum: 0.9
+weight_decay: 0.0001
+stepsize: 29302
+snapshot: 5860
+snapshot_prefix: "tmp/pnet"
+solver_mode: GPU
+net: "proto/p_train_val.prototxt"
+test_initialization: false
+average_loss: 500

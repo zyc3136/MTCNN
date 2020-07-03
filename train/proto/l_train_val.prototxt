@@ -1,0 +1,324 @@
+name: "lNet"
+
+layer {
+  name: "data"
+  type: "HDF5Data"
+  top: "data"
+  top: "target"
+  hdf5_data_param {
+    source: "data/lnet_train.txt"
+    batch_size: 128
+  }
+  include {
+    phase: TRAIN
+  }
+}
+layer {
+  name: "data"
+  type: "HDF5Data"
+  top: "data"
+  top: "target"
+  hdf5_data_param {
+    source: "data/lnet_val.txt"
+    batch_size: 128
+  }
+  include {
+    phase: TEST
+  }
+}
+layer {
+  name: "target_slice"
+  type: "Slice"
+  bottom: "target"
+  top: "target_1"
+  top: "target_2"
+  top: "target_3"
+  top: "target_4"
+  top: "target_5"
+  slice_param {
+    axis: 1
+    slice_point: 2
+    slice_point: 4
+    slice_point: 6
+    slice_point: 8
+  }
+}
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 50
+    group: 5
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "prelu1"
+  type: "PReLU"
+  bottom: "conv1"
+  top: "conv1"
+}
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "conv1"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+  }
+}
+layer {
+  name: "conv2"
+  type: "Convolution"
+  bottom: "pool1"
+  top: "conv2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 100
+    group: 5
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "prelu2"
+  type: "PReLU"
+  bottom: "conv2"
+  top: "conv2"
+}
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "conv2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+  }
+}
+
+layer {
+  name: "conv3"
+  type: "Convolution"
+  bottom: "pool2"
+  top: "conv3"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 200
+    group: 5
+    kernel_size: 2
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "prelu3"
+  type: "PReLU"
+  bottom: "conv3"
+  top: "conv3"
+}
+layer {
+  name: "conv4"
+  type: "Convolution"
+  bottom: "conv3"
+  top: "conv4"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 100
+    group: 5
+    kernel_size: 3
+    stride: 3
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "prelu4"
+  type: "PReLU"
+  bottom: "conv4"
+  top: "conv4"
+}
+layer {
+  name: "conv5"
+  type: "Convolution"
+  bottom: "conv4"
+  top: "conv5"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 50
+    group: 5
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "prelu5"
+  type: "PReLU"
+  bottom: "conv5"
+  top: "conv5"
+}
+layer {
+  name: "conv6"
+  type: "Convolution"
+  bottom: "conv5"
+  top: "conv6"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 10
+    group: 5
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "landmark"
+  type: "Reshape"
+  bottom: "conv6"
+  top: "landmark"
+  reshape_param {
+    shape {
+      dim: 0
+      dim: 10
+    }
+  }
+}
+######## slice output ########
+layer {
+  name: "landmark_slice"
+  type: "Slice"
+  bottom: "landmark"
+  top: "landmark_1"
+  top: "landmark_2"
+  top: "landmark_3"
+  top: "landmark_4"
+  top: "landmark_5"
+  slice_param {
+    axis: 1
+    slice_point: 2
+    slice_point: 4
+    slice_point: 6
+    slice_point: 8
+  }
+}
+######## net-1 output ########
+layer {
+  name: "loss_1"
+  type: "EuclideanLoss"
+  bottom: "landmark_1"
+  bottom: "target_1"
+  top: "loss_1"
+}
+######## net-2 output ########
+layer {
+  name: "loss_2"
+  type: "EuclideanLoss"
+  bottom: "landmark_2"
+  bottom: "target_2"
+  top: "loss_2"
+}
+######## net-3 output ########
+layer {
+  name: "loss_3"
+  type: "EuclideanLoss"
+  bottom: "landmark_3"
+  bottom: "target_3"
+  top: "loss_3"
+}
+######## net-4 output ########
+layer {
+  name: "loss_4"
+  type: "EuclideanLoss"
+  bottom: "landmark_4"
+  bottom: "target_4"
+  top: "loss_4"
+}
+######## net-5 output ########
+layer {
+  name: "loss_5"
+  type: "EuclideanLoss"
+  bottom: "landmark_5"
+  bottom: "target_5"
+  top: "loss_5"
+}
